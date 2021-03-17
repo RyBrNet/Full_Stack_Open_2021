@@ -1,0 +1,21 @@
+note over browser:
+User enters text into form and clicks submit.
+end note
+note over browser:
+Browser adds new note to the page via Javascript and rerenders note list. 
+end note
+note over browser:
+Browser sends note in JSON format via HTTP POST to server.
+end note
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+
+note over server:
+Server has code to accept HTTP POST.
+Appendes the note contained in the body of the POST to its list of notes.
+end note
+
+server-->browser: 201 - Created
+
+note over server:
+Server respondes with status code 201 - created
+end note
