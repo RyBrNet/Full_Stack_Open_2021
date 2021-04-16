@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import axios from 'axios'
 
 const Button = ({handleClick, text}) => (
   <button 
@@ -23,24 +24,60 @@ const DisplayLanguageName = ({ language }) => {
   )
 };
 
-const DisplayDetailedCountry = ({ country }) => {
-  return (
-    <div>
-      <h3>
-        {country.name}
-      </h3>
-      <div>Capital: {country.capital}</div>
-      <div>Population: {country.population}</div>
-      <div>Top Languages</div>
-      <ul>
-        {
-          country.languages.map((language) => (
-            <DisplayLanguageName key={language.name} language={language} />))
-        }
-      </ul>
-      <img src={country.flag} alt='Flag of individual country found'></img>
-    </div>
-  )
+const DisplayDetailedCountry = ({ country, weatherData, setWeatherData }) => {
+  const api_key = process.env.REACT_APP_API_KEY
+    
+  useEffect(() => {
+    axios
+      .get(`http://api.weatherstack.com/current?access_key=${api_key}&query=${country.capital}`)
+      .then(response => {
+        setWeatherData(response.data)
+        console.log(weatherData)
+      })
+  }, [api_key, country.capital])
+
+  console.log(weatherData)
+  if(weatherData.length !== 0) {
+    return (
+      <div>
+        <h3>
+          {country.name}
+        </h3>
+        <div>Capital: {country.capital}</div>
+        <div>Population: {country.population}</div>
+        <div>Top Languages</div>
+        <ul>
+          {
+            country.languages.map((language) => (
+              <DisplayLanguageName key={language.name} language={language} />))
+          }
+        </ul>
+        <img src={country.flag} alt='Flag of individual country found'></img>
+        <h4>Weather in {country.name}</h4>
+        <div>Temperature: {weatherData.current.temperature}(c)</div>
+        <img src={weatherData.current.weather_icons[0]} alt='Weather Icon'></img>
+        <div>Wind: {weatherData.current.wind_speed}{weatherData.current.wind_dir}</div>
+      </div>
+    )
+  } else {
+    return (
+      <div>
+        <h3>
+          {country.name}
+        </h3>
+        <div>Capital: {country.capital}</div>
+        <div>Population: {country.population}</div>
+        <div>Top Languages</div>
+        <ul>
+          {
+            country.languages.map((language) => (
+              <DisplayLanguageName key={language.name} language={language} />))
+          }
+        </ul>
+        <img src={country.flag} alt='Flag of individual country found'></img>
+      </div>
+    )
+  }
 };
 
 const DisplayMultipleCountries = ({ countries, setDetailedCountry }) => {
@@ -54,7 +91,7 @@ const DisplayMultipleCountries = ({ countries, setDetailedCountry }) => {
   )
 };
 
-const DisplayCountries = ({ countries, countryFilter, detailedCountry, setDetailedCountry }) => {
+const DisplayCountries = ({ countries, countryFilter, detailedCountry, setDetailedCountry, weatherData, setWeatherData }) => {
   const countriesToShow =
   countryFilter === ""
       ? countries
@@ -64,7 +101,7 @@ const DisplayCountries = ({ countries, countryFilter, detailedCountry, setDetail
 
   if(detailedCountry !== '') {
     //Details of a specific country requested
-    return <DisplayDetailedCountry country={detailedCountry}/>
+    return <DisplayDetailedCountry country={detailedCountry} weatherData={weatherData} setWeatherData={setWeatherData}/>
 
   } else if (countriesToShow.length > 10) {
     // More than ten matches so ask for a more detailed filter
@@ -72,7 +109,7 @@ const DisplayCountries = ({ countries, countryFilter, detailedCountry, setDetail
 
   } else if (countriesToShow.length === 1) {
     // Single country matched, display detailed info
-    return <DisplayDetailedCountry country={countriesToShow[0]}/>
+    return <DisplayDetailedCountry country={countriesToShow[0]} weatherData={weatherData} setWeatherData={setWeatherData}/>
 
   } else {
     // 2 to 10 Countries matched. Display their names with a button next to them for detailed info

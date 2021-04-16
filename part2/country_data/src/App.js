@@ -7,6 +7,7 @@ const App = () => {
   const [countries, setCountries] = useState([]);
   const [countryFilter, setCountryFilter] = useState("");
   const [detailedCountry, setDetailedCountry] = useState("");
+  const [weatherData, setWeatherData] = useState([]);
 
   useEffect(() => {
     axios
@@ -23,7 +24,8 @@ const App = () => {
 
       <h3>Countries Found</h3>
       <DisplayCountries countries={countries} countryFilter={countryFilter} 
-        detailedCountry={detailedCountry} setDetailedCountry={setDetailedCountry} />
+        detailedCountry={detailedCountry} setDetailedCountry={setDetailedCountry}
+        weatherData={weatherData} setWeatherData={setWeatherData} />
     </div>
   );
 };
