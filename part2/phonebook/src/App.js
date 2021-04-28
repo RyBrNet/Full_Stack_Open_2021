@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from 'axios'
 import DisplayPeople from "./components/DisplayPeople.js";
 import Filter from "./components/Filter.js";
 import NewAddition from "./components/NewAddition.js";
+import personsService from "./services/persons.js"
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -11,12 +11,11 @@ const App = () => {
   const [nameFilter, setNameFilter] = useState("");
 
   useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
+    personsService
+      .getAll()
       .then(response => {
         console.log('promise fulfilled')
-        setPersons(response.data)
+        setPersons(response)
       })
   }, [])
 
@@ -36,7 +35,7 @@ const App = () => {
       />
 
       <h3>Numbers</h3>
-      <DisplayPeople persons={persons} nameFilter={nameFilter} />
+      <DisplayPeople persons={persons} nameFilter={nameFilter} setPersons={setPersons} />
     </div>
   );
 };

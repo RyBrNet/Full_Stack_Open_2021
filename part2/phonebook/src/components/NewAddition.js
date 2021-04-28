@@ -1,4 +1,5 @@
 import React from "react";
+import personsService from "../services/persons.js";
 
 const NewAddition = ({
   persons,
@@ -18,7 +19,8 @@ const NewAddition = ({
 
   const addPerson = (event) => {
     event.preventDefault();
-    console.log("button clicked", event.target);
+
+    console.log("Add button clicked", event.target);
     const personObject = {
       name: newName,
       phoneNumber: newPhoneNumber,
@@ -26,11 +28,29 @@ const NewAddition = ({
 
     const found = persons.find((element) => element.name === newName);
     if (found === undefined) {
-      setPersons(persons.concat(personObject));
-      setNewName("");
-      setNewPhoneNumber("");
+      personsService.create(personObject).then((response) => {
+        console.log("promise fulfilled");
+        setPersons(persons.concat(response));
+        setNewName("");
+        setNewPhoneNumber("");
+      });
     } else {
-      window.alert(`${newName} is already added to the phonebook`);
+      if (
+        window.confirm(
+          `${found.name} is already in the phonebook, replace the old number with a  new one?`
+        )
+      ) {
+        personsService.update(found.id, personObject).then((response) => {
+          console.log("promise fulfilled");
+          setPersons(
+            persons.map((person) =>
+              person.id !== found.id ? person : response
+            )
+          );
+          setNewName("");
+          setNewPhoneNumber("");
+        });
+      }
     }
   };
 
@@ -44,7 +64,7 @@ const NewAddition = ({
         <input value={newPhoneNumber} onChange={handlePhoneChange} />
       </div>
       <div>
-        <button type="submit">add</button>
+        <button type="submit">Add</button>
       </div>
     </form>
   );
